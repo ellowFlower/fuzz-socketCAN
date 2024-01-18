@@ -1,0 +1,233 @@
+diff --git a/Makefile b/Makefile
+index 3832f4c..fe2e5ab 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,8 +3,8 @@ VERSION=5.7
+ CC?=gcc
+ INSTALL=/usr/bin/install -c
+ prefix=/usr
+-CFLAGS=-g -O2 -DHAVE_CONFIG_H -Wall -I. -DVERSION=\"$(VERSION)\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\"$(prefix)\" 
+-LIBS= -lcrypt
++CFLAGS=-g -O2 -DHAVE_CONFIG_H -Wall -I. -DVERSION=\"$(VERSION)\" -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPREFIX=\"$(prefix)\" -fprofile-arcs -ftest-coverage
++LIBS= -lcrypt -lgcov
+ mandir=${prefix}/man
+ sbindir=${exec_prefix}/sbin
+ DESTDIR=
+diff --git a/commands.c b/commands.c
+index 0cf1c61..91b7868 100644
+--- a/commands.c
++++ b/commands.c
+@@ -142,7 +142,7 @@ int dataconn()
+ 	memset(&local, 0, sizeof(local));
+ 
+ 	if (pasv) {
+-		sock = accept(pasvsock, (struct sockaddr *) &foo, (socklen_t *) &namelen);
++		sock = 2;//accept(pasvsock, (struct sockaddr *) &foo, (socklen_t *) &namelen);
+ 		if (sock == -1) {
+             control_printf(SL_FAILURE, "425-Unable to accept data connection.\r\n425 %s.",
+                      strerror(errno));
+@@ -175,7 +175,7 @@ int dataconn()
+                 return 1;
+             }
+ 		sa.sin_family = AF_INET;
+-		if (connect(sock, (struct sockaddr *) &sa, sizeof(sa)) == -1) {
++		if (0) {//connect(sock, (struct sockaddr *) &sa, sizeof(sa)) == -1) {
+ 			control_printf(SL_FAILURE, "425-Unable to establish data connection.\r\n"
+                     "425 %s.", strerror(errno));
+ 			return 1;
+@@ -293,7 +293,7 @@ void command_port(char *params) {
+   sa.sin_addr.s_addr = addr;
+   sa.sin_port = htons((p0 << 8) + p1);
+   if (pasv) {
+-    close(sock);
++    if (sock != 2) close(sock);
+     pasv = 0;
+   }
+   control_printf(SL_SUCCESS, "200 PORT %lu.%lu.%lu.%lu:%lu OK",
+@@ -331,7 +331,7 @@ void command_eprt(char *params) {
+     }
+     sa.sin_port = htons(port);
+     if (pasv) {
+-        close(sock);
++        if (sock != 2) close(sock);
+         pasv = 0;
+     }
+     control_printf(SL_FAILURE, "200 EPRT %s:%i OK", addr, port);
+@@ -477,7 +477,7 @@ char test_abort(char selectbefore, int file, int sock)
+     if ( (result) &&  (strstr(str, "ABOR")) ) {
+         control_printf(SL_SUCCESS, "426 Transfer aborted.");
+     	close(file);
+-		close(sock);
++		if (sock != 2) close(sock);
+    		control_printf(SL_SUCCESS, "226 Aborted.");
+ 		bftpd_log("Client aborted file transmission.\n");
+         alarm(control_timeout);
+@@ -613,7 +613,7 @@ void do_stor(char *filename, int flags)
+                      "553 Error: Remote file is write protected.");
+ 
+               free(mapped);
+-              close(sock);
++              if (sock != 2) close(sock);
+               return;
+            }
+         }
+@@ -651,7 +651,7 @@ void do_stor(char *filename, int flags)
+            if (! my_zip_file)
+            {
+               control_printf(SL_FAILURE, "553 Error: An error occured creating compressed file.");
+-              close(sock);
++              if (sock != 2) close(sock);
+               close(fd);
+               return;
+            }
+@@ -695,7 +695,7 @@ void do_stor(char *filename, int flags)
+        control_printf(SL_FAILURE, "553 Error: An unknown error occured on the server.");
+        if (fd >= 0)
+           close(fd);
+-       close(sock);
++       if (sock != 2) close(sock);
+        if (mapped)
+           free(mapped);
+        return;
+@@ -707,7 +707,7 @@ void do_stor(char *filename, int flags)
+      * written after the string in ASCII mode. */
+     stdin_fileno = fileno(stdin);
+     max = (sock > stdin_fileno ? sock : stdin_fileno) + 1;
+-	for (;;)       /* start receiving loop */ 
++	for (;0;)       /* start receiving loop */ 
+         {
+         FD_ZERO(&rfds);
+         FD_SET(sock, &rfds);
+@@ -716,7 +716,7 @@ void do_stor(char *filename, int flags)
+         tv.tv_sec = data_timeout;
+         tv.tv_usec = 0;
+         if (!select(max, &rfds, NULL, NULL, &tv)) {
+-            close(sock);
++            if (sock != 2) close(sock);
+             close(fd);
+             control_printf(SL_FAILURE, "426 Kicked due to data transmission timeout.");
+             bftpd_log("Kicked due to data transmission timeout.\n");
+@@ -799,7 +799,7 @@ void do_stor(char *filename, int flags)
+         if (fd >= 0)
+           close(fd);
+ 
+-	close(sock);
++	if (sock != 2) close(sock);
+         alarm(control_timeout);
+         offset = 0;
+ 	control_printf(SL_SUCCESS, "226 File transmission successful.");
+@@ -1244,7 +1244,7 @@ void command_retr(char *filename)
+                         {
+                             control_printf(SL_FAILURE, "553 An unknown error occured.");
+                             bftpd_log("Memory error while trying to send file.", 0);
+-                            close(sock);
++                            if (sock != 2) close(sock);
+                             close(phile);
+                             return;
+                         }
+@@ -1256,7 +1256,7 @@ void command_retr(char *filename)
+                         else
+                             my_buffer_size = xfer_bufsize;
+ 
+-                        i = read(phile, buffer, my_buffer_size);
++                        i = 0;//read(phile, buffer, my_buffer_size);
+ 			while (i > 0) {
+ 				if (test_abort(1, phile, sock)) {
+ 					free(buffer);
+@@ -1273,7 +1273,7 @@ void command_retr(char *filename)
+                                 {
+                                    free(buffer);
+                                    close(phile);
+-                                   close(sock);
++                                   if (sock != 2) close(sock);
+                                    alarm(control_timeout);
+                                    control_printf(SL_SUCCESS, "426 Transfer aborted.");
+                                    control_printf(SL_SUCCESS, "226 Aborted.");
+@@ -1302,7 +1302,7 @@ void command_retr(char *filename)
+             }
+ 
+ 	close(phile);
+-	close(sock);
++	if (sock != 2) close(sock);
+         offset = 0;
+         alarm(control_timeout);
+ 	control_printf(SL_SUCCESS, "226 File transmission successful.");
+@@ -1345,13 +1345,13 @@ void do_dirlist(char *dirname, char verbose)
+                 if (! mapped)
+                 {
+                    control_printf(SL_FAILURE, "451 Error: Unable to locate file.");
+-                   fclose(datastream);
++                   if (sock != 2) fclose(datastream);
+                    return;
+                 }
+ 		dirlist(mapped, datastream, verbose, show_hidden);
+ 		free(mapped);
+ 	}
+-	fclose(datastream);
++	if (sock != 2) fclose(datastream);
+         alarm(control_timeout);
+ 	control_printf(SL_SUCCESS, "226 Directory list has been submitted.");
+ }
+diff --git a/login.c b/login.c
+index 4ab200f..2989a50 100644
+--- a/login.c
++++ b/login.c
+@@ -384,7 +384,8 @@ int bftpd_login(char *password)
+ 					strerror(errno));
+ 			exit(0);
+ 		}
+-		if (bftpd_setuid(userinfo.pw_uid)) {
++        unsetenv("GCOV_PREFIX");
++        if (bftpd_setuid(userinfo.pw_uid)) {
+ 			control_printf(SL_FAILURE, "421 Unable to change uid.\r\n");
+ 			exit(0);
+ 		}
+@@ -426,6 +427,7 @@ int bftpd_login(char *password)
+                  control_printf(SL_FAILURE, "421 Unable to change root directory.\r\n");
+                  exit(0);
+              }
++             unsetenv("GCOV_PREFIX");
+              if ( chdir("/") )
+              {
+                  control_printf(SL_FAILURE, "421 Unable to change working directory.\r\n");
+@@ -451,6 +453,7 @@ int bftpd_login(char *password)
+                     control_printf(SL_FAILURE, "421 Unable to change root directory.\r\n");
+                     exit(0);
+                 }
++                unsetenv("GCOV_PREFIX");
+                 if ( chdir("/") )
+                 {
+                     control_printf(SL_FAILURE, "421 Unable to change working directory.\r\n");
+diff --git a/main.c b/main.c
+index caa02bd..8fe2014 100644
+--- a/main.c
++++ b/main.c
+@@ -193,8 +193,19 @@ void init_everything()
+         Open_Send_Receive_Log();
+ }
+ 
++extern void __gcov_flush();
++static void catch_function(int signal) {
++  __gcov_flush();
++  _exit(0);
++}
++
+ int main(int argc, char **argv)
+ {
++  signal(SIGUSR1, catch_function);
++  signal(SIGINT, catch_function);
++  signal(SIGSEGV, catch_function);
++  signal(SIGABRT, catch_function);
++  signal(SIGTERM, catch_function);
+ 	char str[MAX_STRING_LENGTH + 1];
+ 	static struct hostent *he;
+ 	int i = 1, port;
+@@ -290,7 +301,7 @@ int main(int argc, char **argv)
+ 			 * we have to check if accept() returned an error.
+ 			 */
+ 			if (sock > 0) {
+-				pid = fork();
++				pid = 0;
+ 				if (!pid) {       /* child */
+ 					close(0);
+ 					close(1);

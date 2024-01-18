@@ -1,0 +1,7 @@
+[submodule "qemu-nyx"]
+	path = qemu-nyx
+	url = https://github.com/nyx-fuzz/QEMU-Nyx.git
+	branch = qemu-nyx-4.2.0
+[submodule "libxdc"]
+	path = libxdc
+	url = https://github.com/nyx-fuzz/libxdc.git

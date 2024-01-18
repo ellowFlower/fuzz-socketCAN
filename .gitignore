@@ -1,0 +1,4 @@
+targets/packed_targets
+targets/setup_scripts/build
+*.diff
+.vscode

@@ -1,0 +1,34 @@
+00400000-00401000 r--p 00000000 00:16 8                                  /tmp/target_executable
+00401000-00404000 r-xp 00001000 00:16 8                                  /tmp/target_executable
+00404000-00405000 r--p 00004000 00:16 8                                  /tmp/target_executable
+00405000-00406000 r--p 00004000 00:16 8                                  /tmp/target_executable
+00406000-00407000 rw-p 00005000 00:16 8                                  /tmp/target_executable
+00407000-00417000 rw-p 00000000 00:00 0                                  [heap]
+00417000-00438000 rw-p 00000000 00:00 0                                  [heap]
+7ffff7d5e000-7ffff7d5f000 rw-p 00000000 00:00 0 
+7ffff7d5f000-7ffff7d60000 rw-s 00000000 00:01 3                          /dev/zero (deleted)
+7ffff7d60000-7ffff7d70000 rw-s 00000000 00:01 2                          /dev/zero (deleted)
+7ffff7d70000-7ffff7d74000 rw-p 00000000 00:00 0 
+7ffff7d74000-7ffff7d9c000 r--p 00000000 00:16 7                          /tmp/libc.so.6
+7ffff7d9c000-7ffff7f31000 r-xp 00028000 00:16 7                          /tmp/libc.so.6
+7ffff7f31000-7ffff7f89000 r--p 001bd000 00:16 7                          /tmp/libc.so.6
+7ffff7f89000-7ffff7f8d000 r--p 00214000 00:16 7                          /tmp/libc.so.6
+7ffff7f8d000-7ffff7f8f000 rw-p 00218000 00:16 7                          /tmp/libc.so.6
+7ffff7f8f000-7ffff7f9c000 rw-p 00000000 00:00 0 
+7ffff7f9c000-7ffff7fa1000 r--p 00000000 00:16 5                          /tmp/ld_preload_fuzz.so
+7ffff7fa1000-7ffff7fa9000 r-xp 00005000 00:16 5                          /tmp/ld_preload_fuzz.so
+7ffff7fa9000-7ffff7fac000 r--p 0000d000 00:16 5                          /tmp/ld_preload_fuzz.so
+7ffff7fac000-7ffff7fad000 ---p 00010000 00:16 5                          /tmp/ld_preload_fuzz.so
+7ffff7fad000-7ffff7fae000 r--p 00010000 00:16 5                          /tmp/ld_preload_fuzz.so
+7ffff7fae000-7ffff7faf000 rw-p 00011000 00:16 5                          /tmp/ld_preload_fuzz.so
+7ffff7faf000-7ffff7fbd000 rw-p 00000000 00:00 0 
+7ffff7fbd000-7ffff7fc1000 r--p 00000000 00:00 0                          [vvar]
+7ffff7fc1000-7ffff7fc3000 r-xp 00000000 00:00 0                          [vdso]
+7ffff7fc3000-7ffff7fc5000 r--p 00000000 00:02 25                         /lib64/ld-linux-x86-64.so.2
+7ffff7fc5000-7ffff7fef000 r-xp 00002000 00:02 25                         /lib64/ld-linux-x86-64.so.2
+7ffff7fef000-7ffff7ffa000 r--p 0002c000 00:02 25                         /lib64/ld-linux-x86-64.so.2
+7ffff7ffa000-7ffff7ffb000 rw-p 00000000 00:00 0 
+7ffff7ffb000-7ffff7ffd000 r--p 00037000 00:02 25                         /lib64/ld-linux-x86-64.so.2
+7ffff7ffd000-7ffff7fff000 rw-p 00039000 00:02 25                         /lib64/ld-linux-x86-64.so.2
+7ffffffde000-7ffffffff000 rw-p 00000000 00:00 0                          [stack]
+ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]

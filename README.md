@@ -1,6 +1,6 @@
 Extension of the fuzzer [Nyx-Net](https://github.com/RUB-SysSec/nyx-net) with additional functionality to fuzz SocketCAN targets.
 
-Implemented within the master thesis 
+Implemented withing the following [master thesis](thesis.pdf).
 
 ## Setup on Ubuntu 22.04
 
